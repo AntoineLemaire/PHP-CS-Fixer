@@ -630,6 +630,11 @@ Choose from the list of available rules:
   - ``annotations`` (``array``): list of annotations to remove, e.g. ``["author"]``;
     defaults to ``[]``
 
+* **grouped_imports**
+
+  Group imports in the same location (same place as the first ``use``
+  occurence)
+
 * **hash_to_slash_comment**
 
   Single line comments should use double slashes ``//`` and not hash ``#``.
