@@ -15,6 +15,7 @@ namespace PhpCsFixer\Fixer\Import;
 use PhpCsFixer\AbstractFixer;
 use PhpCsFixer\FixerDefinition\CodeSample;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Tokenizer\CT;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\TokensAnalyzer;
 
@@ -41,6 +42,15 @@ final class GroupedImportsFixer extends AbstractFixer
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        // should be run after the OrderedImportsFixer
+        return -40;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isCandidate(Tokens $tokens)
     {
         return $tokens->isTokenKindFound(T_USE);
@@ -54,37 +64,50 @@ final class GroupedImportsFixer extends AbstractFixer
         $tokensAnalyzer = new TokensAnalyzer($tokens);
 
         $uses = [];
-        $lastIndex = $tokens->count() - 1;
 
         $importUseIndexes = $tokensAnalyzer->getImportUseIndexes();
         $firstUseIndex = $importUseIndexes[0];
 
-        foreach ($importUseIndexes as $index) {
+
+        foreach ($importUseIndexes as $importUseIndex) {
             $use = [];
-            $i = $index - 1;
 
-            do {
-                ++$i;
+            $newLineIndex = $this->getNextNewLine($tokens, $importUseIndex);
 
+            for ($i = $importUseIndex; $i <= $newLineIndex; ++$i) {
                 $use[] = $tokens[$i];
-                $lastToken = $tokens[$i];
+            }
 
-                if ($i <= $lastIndex) {
-                    $tokens->clearAt($i);
-                }
-            } while ((bool) false === strpos($lastToken->getContent(), "\n") && $i < $lastIndex);
             $uses[] = $use;
+            $tokens->clearRange($importUseIndex, $newLineIndex);
         }
 
         $index = $firstUseIndex;
         foreach ($uses as $useTokens) {
-            foreach ($useTokens as $token) {
-                $tokens->insertAt($index, $token);
-                ++$index;
-            }
+            $tokens->insertAt($index, $useTokens);
+            $index += count($useTokens);
         }
 
         $tokens->clearEmptyTokens();
         $tokens->clearChanged();
+    }
+
+    /**
+     * @param Tokens $tokens
+     * @param int    $indexStart
+     *
+     * @return mixed
+     */
+    private function getNextNewLine(Tokens $tokens, $indexStart)
+    {
+        $lastIndex = $tokens->count() - 1;
+
+        $index = $indexStart;
+
+        while (false === strpos($tokens[$index]->getContent(), "\n") && $index <= $lastIndex) {
+            ++$index;
+        }
+
+        return $index;
     }
 }

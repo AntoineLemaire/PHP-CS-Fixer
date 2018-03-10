@@ -56,6 +56,28 @@ use function Vendor\Package\Qux; /* Other comment */
 use const Vendor\Package\QUUX;
 
 class A { public function B(){ return "foo"; } };
+'], ['<?php
+
+use Foo;
+use function Vendor\Package\Baz;
+
+use Bar; // Comment
+use const Another\Vendor\CORGE;
+
+use function Vendor\Package\Qux; /* Other comment */
+use const Vendor\Package\QUUX;
+
+class A { public function B(){ return "foo"; } };
+'], ['<?php
+
+use Foo;
+use function Vendor\Package\Baz;
+use Bar; // Comment
+use const Another\Vendor\CORGE;
+use function Vendor\Package\Qux; /* Other comment */
+use const Vendor\Package\QUUX;
+
+class A { use C; public function B(){ return "foo"; } };
 '],
         ];
     }
