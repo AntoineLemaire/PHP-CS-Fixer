@@ -15,7 +15,6 @@ namespace PhpCsFixer\Fixer\Import;
 use PhpCsFixer\AbstractFixer;
 use PhpCsFixer\FixerDefinition\CodeSample;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\Tokenizer\CT;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\TokensAnalyzer;
 
@@ -67,7 +66,6 @@ final class GroupedImportsFixer extends AbstractFixer
 
         $importUseIndexes = $tokensAnalyzer->getImportUseIndexes();
         $firstUseIndex = $importUseIndexes[0];
-
 
         foreach ($importUseIndexes as $importUseIndex) {
             $use = [];
